@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase, getWorkingFileUrl } from '../lib/supabase';
-import { ChevronDown, ChevronUp, PlayCircle, ExternalLink, Download } from 'lucide-react';
-import FilePreviewModal from '../components/FilePreviewModal'; // Keep fallback? No, replacing with inline.
+import { ChevronDown, ChevronUp, PlayCircle, ExternalLink, Download, FileText, Image as ImageIcon } from 'lucide-react';
 
 const PageView = () => {
     const { id } = useParams();
@@ -11,8 +10,6 @@ const PageView = () => {
     const [options, setOptions] = useState({});
     const [loading, setLoading] = useState(true);
     const [openMenus, setOpenMenus] = useState({});
-
-    // Inline preview is default now
 
     useEffect(() => {
         fetchContent();
@@ -48,7 +45,7 @@ const PageView = () => {
             });
             setOptions(optionsMap);
 
-            // Open all menus by default for better reading flow
+            // Open all menus by default
             const initialOpenState = {};
             menusData.forEach(m => initialOpenState[m.id] = true);
             setOpenMenus(initialOpenState);
@@ -69,63 +66,70 @@ const PageView = () => {
     };
 
     if (loading) return (
-        <div className="flex items-center justify-center p-12">
-            <div className="w-8 h-8 border-2 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
+        <div className="flex items-center justify-center p-12 h-[50vh]">
+            <div className="w-10 h-10 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
         </div>
     );
 
-    if (!page) return <div className="text-center p-12 text-slate-500">الصفحة غير موجودة</div>;
+    if (!page) return <div className="text-center p-12 text-slate-500 font-bold text-lg">الصفحة غير موجودة</div>;
 
     return (
-        <div className="max-w-4xl mx-auto pb-12 animate-fade-in relative z-0">
+        <div className="max-w-4xl mx-auto pb-20 animate-fade-in relative z-0">
             {/* Header */}
-            <div className="mb-6 flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">{page.title}</h1>
-                    <div className="h-1 w-20 bg-primary-500 rounded-full"></div>
-                </div>
+            <div className="mb-8">
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 leading-tight">{page.title}</h1>
+                <div className="h-1.5 w-24 bg-gradient-to-r from-primary-500 to-primary-300 rounded-full"></div>
             </div>
 
             {/* Menus & Content */}
-            <div className="space-y-4">
+            <div className="space-y-6">
                 {menus.map(menu => (
-                    <div key={menu.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden transition-all duration-300">
+                    <div key={menu.id} className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden transition-all duration-300 hover:shadow-md">
                         <button
                             onClick={() => toggleMenu(menu.id)}
-                            className="w-full flex items-center justify-between p-4 sm:p-5 bg-gradient-to-l from-white to-slate-50 hover:bg-slate-50 transition-colors"
+                            className="w-full flex items-center justify-between p-5 sm:p-6 bg-slate-50 hover:bg-slate-100 transition-colors border-b border-slate-100"
                         >
-                            <h2 className="text-lg font-bold text-slate-700">{menu.title}</h2>
+                            <h2 className="text-xl font-bold text-slate-800 flex items-center gap-3">
+                                <span className={`w-2 h-8 rounded-full ${openMenus[menu.id] ? 'bg-primary-500' : 'bg-slate-300'} transition-colors`}></span>
+                                {menu.title}
+                            </h2>
                             {openMenus[menu.id] ? (
-                                <ChevronUp className="w-5 h-5 text-primary-500" />
+                                <ChevronUp className="w-6 h-6 text-primary-600" />
                             ) : (
-                                <ChevronDown className="w-5 h-5 text-slate-400" />
+                                <ChevronDown className="w-6 h-6 text-slate-400" />
                             )}
                         </button>
 
-                        <div className={`transition-all duration-500 ease-in-out overflow-hidden ${openMenus[menu.id] ? 'max-h-[3000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                            <div className="p-4 sm:p-6 space-y-8 border-t border-slate-100">
+                        <div className={`transition-all duration-500 ease-in-out ${openMenus[menu.id] ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+                            <div className="p-5 sm:p-8 space-y-10 bg-white">
                                 {options[menu.id]?.length === 0 && (
-                                    <p className="text-center text-slate-400 text-sm py-4">لا يوجد محتوى في هذا القسم</p>
+                                    <p className="text-center text-slate-400 font-medium py-8">لا يوجد محتوى في هذا القسم</p>
                                 )}
 
                                 {options[menu.id]?.map((option, index) => (
-                                    <div key={option.id} className={`${index > 0 ? 'pt-6 border-t border-slate-50' : ''}`}>
-                                        <h3 className="text-xl font-bold text-primary-800 mb-4 flex items-center gap-2">
-                                            <span className="w-2 h-2 rounded-full bg-primary-400 inline-block"></span>
-                                            {option.title}
-                                        </h3>
+                                    <div key={option.id} className={`${index > 0 ? 'pt-8 border-t border-slate-100' : ''}`}>
+                                        <div className="flex items-center gap-3 mb-5">
+                                            <div className="w-8 h-8 rounded-xl bg-primary-100 text-primary-700 flex items-center justify-center font-bold text-sm">
+                                                {index + 1}
+                                            </div>
+                                            <h3 className="text-2xl font-bold text-slate-900">{option.title}</h3>
+                                        </div>
 
-                                        {/* HTML Content (Reading Layout) */}
+                                        {/* HTML Content */}
                                         {option.content && (
                                             <div
-                                                className="prose prose-slate max-w-none prose-p:text-slate-600 prose-p:leading-relaxed prose-headings:text-slate-800 prose-img:rounded-xl mb-6"
+                                                className="prose prose-lg prose-slate max-w-none 
+                                                prose-p:text-slate-700 prose-p:leading-8 
+                                                prose-headings:text-slate-900 prose-headings:font-bold
+                                                prose-li:text-slate-700 prose-strong:text-slate-900
+                                                prose-img:rounded-2xl prose-img:shadow-md mb-8"
                                                 dangerouslySetInnerHTML={{ __html: option.content }}
                                             />
                                         )}
 
                                         {/* Video Embed */}
                                         {option.video_url && (
-                                            <div className="mb-6 rounded-2xl overflow-hidden shadow-lg border border-slate-100 bg-black aspect-video relative group">
+                                            <div className="mb-8 rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-slate-900 aspect-video relative group">
                                                 {option.video_url.includes('youtube.com') || option.video_url.includes('youtu.be') ? (
                                                     <iframe
                                                         className="w-full h-full"
@@ -135,65 +139,84 @@ const PageView = () => {
                                                         allowFullScreen
                                                     ></iframe>
                                                 ) : (
-                                                    <div className="flex items-center justify-center h-full text-slate-400">
-                                                        <a href={option.video_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-white transition-colors">
-                                                            <PlayCircle className="w-10 h-10" />
-                                                            <span>رابط الفيديو خارجي</span>
+                                                    <div className="flex flex-col items-center justify-center h-full text-slate-400 gap-4">
+                                                        <PlayCircle className="w-16 h-16 text-white opacity-80 group-hover:opacity-100 transition-opacity" />
+                                                        <a href={option.video_url} target="_blank" rel="noopener noreferrer" className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors font-bold backdrop-blur-sm">
+                                                            فتح الفيديو في نافذة جديدة
                                                         </a>
                                                     </div>
                                                 )}
                                             </div>
                                         )}
 
-                                        {/* Inline File Preview (Module) */}
+                                        {/* Auto-Detected File Preview */}
                                         {option.file_url && (() => {
                                             const fileType = getFileType(option.file_url);
 
                                             return (
-                                                <div className="mt-6 bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                                                <div className="mt-8 bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
                                                     {/* File Header */}
-                                                    <div className="px-4 py-3 bg-white border-b border-slate-100 flex items-center justify-between">
-                                                        <span className="text-sm font-bold text-slate-600 flex items-center gap-2">
-                                                            {fileType === 'pdf' ? '📄 ملف PDF' : '🖼️ صورة مرفقة'}
-                                                        </span>
+                                                    <div className="px-5 py-4 bg-white border-b border-slate-100 flex flex-wrap items-center justify-between gap-4">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`p-2 rounded-lg ${fileType === 'pdf' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
+                                                                {fileType === 'pdf' ? <FileText className="w-5 h-5" /> : <ImageIcon className="w-5 h-5" />}
+                                                            </div>
+                                                            <span className="font-bold text-slate-700">
+                                                                {fileType === 'pdf' ? 'ملف PDF مرفق' : 'صورة مرفقة'}
+                                                            </span>
+                                                        </div>
+
                                                         <div className="flex gap-2">
-                                                            <a href={option.file_url} target="_blank" rel="noreferrer" className="p-1.5 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" title="فتح في نافذة جديدة">
+                                                            <a href={option.file_url} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-1.5 text-sm font-bold text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors border border-primary-100">
                                                                 <ExternalLink className="w-4 h-4" />
+                                                                <span>فتح</span>
                                                             </a>
-                                                            <a href={option.file_url} download className="p-1.5 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" title="تحميل">
+                                                            <a href={option.file_url} download className="flex items-center gap-2 px-3 py-1.5 text-sm font-bold text-slate-600 bg-white hover:bg-slate-50 rounded-lg transition-colors border border-slate-200 hover:border-slate-300">
                                                                 <Download className="w-4 h-4" />
+                                                                <span>تحميل</span>
                                                             </a>
                                                         </div>
                                                     </div>
 
-                                                    {/* File Content */}
-                                                    <div className="bg-slate-100/50 p-1 flex justify-center min-h-[300px]">
+                                                    {/* File Display Area */}
+                                                    <div className="bg-slate-100/50 p-1 sm:p-4 flex justify-center min-h-[200px]">
                                                         {fileType === 'image' && (
                                                             <img
                                                                 src={option.file_url}
                                                                 alt={option.title}
-                                                                className="max-w-full h-auto rounded-xl shadow-sm object-contain max-h-[600px]"
+                                                                className="w-full h-auto rounded-xl shadow-sm border border-slate-200"
+                                                                loading="lazy"
                                                             />
                                                         )}
+
                                                         {fileType === 'pdf' && (
-                                                            <object
-                                                                data={option.file_url}
-                                                                type="application/pdf"
-                                                                className="w-full h-[600px] sm:h-[700px] rounded-xl bg-white shadow-sm"
-                                                            >
-                                                                {/* Fallback for mobile/no-pdf-support */}
-                                                                <div className="flex flex-col items-center justify-center h-full p-8 text-center text-slate-500 gap-4">
-                                                                    <p>لا يمكن عرض ملف PDF داخل المتصفح.</p>
+                                                            <div className="w-full flex flex-col gap-4">
+                                                                {/* 1. Primary Method: Google Docs Viewer (Best for Mobile/Cross-Device) */}
+                                                                <div className="w-full h-[500px] sm:h-[700px] rounded-xl bg-white shadow-sm overflow-hidden relative border border-slate-200">
+                                                                    <iframe
+                                                                        src={`https://docs.google.com/gview?url=${encodeURIComponent(option.file_url)}&embedded=true`}
+                                                                        className="w-full h-full border-0"
+                                                                        title="PDF Viewer"
+                                                                    ></iframe>
+                                                                    <div className="absolute top-0 right-0 p-2 pointer-events-none opacity-50">
+                                                                        <span className="text-[10px] text-slate-400">PDF Preview</span>
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* 2. Fallback / Alternative Button */}
+                                                                <div className="text-center p-4">
+                                                                    <p className="text-sm text-slate-500 mb-3">هل تواجه مشكلة في العرض؟</p>
                                                                     <a
                                                                         href={option.file_url}
                                                                         target="_blank"
                                                                         rel="noopener noreferrer"
-                                                                        className="px-6 py-2 bg-primary-600 text-white rounded-xl shadow-lg hover:bg-primary-700 transition-all font-bold"
+                                                                        className="inline-flex items-center gap-2 px-6 py-3 bg-slate-800 text-white rounded-xl shadow-lg hover:bg-slate-700 transition-all font-bold"
                                                                     >
-                                                                        فتح الملف في نافذة جديدة
+                                                                        <FileText className="w-5 h-5" />
+                                                                        عرض ملف PDF الأصلي
                                                                     </a>
                                                                 </div>
-                                                            </object>
+                                                            </div>
                                                         )}
                                                     </div>
                                                 </div>

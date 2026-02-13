@@ -1,40 +1,54 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@import "tailwindcss";
+@layer base {
+  :root {
+    --primary: 157 89% 34%;
+    /* Emerald 600 */
+    --primary-dark: 160 85% 25%;
+    --primary-light: 154 75% 90%;
 
-@theme {
-  --font-sans: 'Cairo', sans-serif;
+    /* Improved Contrast Colors */
+    --text-main: 215 27% 15%;
+    /* Slate 900 */
+    --text-secondary: 215 16% 35%;
+    /* Slate 700 - Darker than before */
+    --bg-app: 210 40% 98%;
+    /* Slate 50 */
+  }
 
-  --color-primary-50: #ecfdf5;
-  --color-primary-100: #d1fae5;
-  --color-primary-200: #a7f3d0;
-  --color-primary-300: #6ee7b7;
-  --color-primary-400: #34d399;
-  --color-primary-500: #10b981;
-  --color-primary-600: #059669;
-  --color-primary-700: #047857;
-  --color-primary-800: #065f46;
-  --color-primary-900: #064e3b;
-  --color-primary-950: #022c22;
-
-  --color-gold-50: #fbf9f1;
-  --color-gold-100: #f5f0db;
-  --color-gold-200: #ebe0b5;
-  --color-gold-300: #dec985;
-  --color-gold-400: #d1af58;
-  --color-gold-500: #c69536;
-  --color-gold-600: #aa762a;
-  --color-gold-700: #885824;
-  --color-gold-800: #704724;
-  --color-gold-900: #5e3c23;
-  --color-gold-950: #351e10;
-
-  --animate-fade-in: fade-in 0.4s ease-out;
-  --animate-slide-in-right: slide-in-right 0.3s ease-out;
-  --animate-scale-in: scale-in 0.2s ease-out;
+  body {
+    background-color: #f8fafc;
+    /* Slate 50 */
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    color: #1e293b;
+    /* Slate 800 */
+    -webkit-font-smoothing: antialiased;
+  }
 }
 
-@keyframes fade-in {
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Animations */
+@keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -46,17 +60,7 @@
   }
 }
 
-@keyframes slide-in-right {
-  from {
-    transform: translateX(100%);
-  }
-
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes scale-in {
+@keyframes scaleIn {
   from {
     opacity: 0;
     transform: scale(0.95);
@@ -68,21 +72,31 @@
   }
 }
 
-@layer base {
-  body {
-    @apply font-sans bg-slate-50 text-slate-900 antialiased;
-  }
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
-/* Custom Scrollbar for a premium feel */
-::-webkit-scrollbar {
-  width: 8px;
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out forwards;
 }
 
-::-webkit-scrollbar-track {
-  @apply bg-transparent;
+/* Typography Improvements */
+.prose {
+  color: #334155;
+  /* Slate 700 */
+  line-height: 1.8;
 }
 
-::-webkit-scrollbar-thumb {
-  @apply bg-primary-200/50 rounded-full hover:bg-primary-300/80 transition-colors;
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  color: #0f172a;
+  /* Slate 900 */
+  font-weight: 700;
+}
+
+.prose strong {
+  color: #0f172a;
+  font-weight: 700;
 }

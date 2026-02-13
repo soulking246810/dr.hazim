@@ -148,7 +148,19 @@ const UserManagement = () => {
             if (error) throw error;
 
             if (data.user) {
-                toast.success('تم إنشاء المستخدم بنجاح');
+                // Auto-confirm the user using RPC
+                try {
+                    const { error: confirmError } = await supabase.rpc('admin_confirm_user', { target_user_id: data.user.id });
+                    if (confirmError) {
+                        console.error('Auto-confirm failed:', confirmError);
+                        toast('تم إنشاء المستخدم لكن فشل التفعيل التلقائي. يرجى تفعيله يدوياً.', { icon: '⚠️' });
+                    } else {
+                        toast.success('تم إنشاء وتفعيل المستخدم بنجاح');
+                    }
+                } catch (e) {
+                    console.error('Auto-confirm exception:', e);
+                }
+
                 setIsCreateModalOpen(false);
                 setTimeout(fetchUsers, 1000);
             }
@@ -157,6 +169,7 @@ const UserManagement = () => {
             console.error('Error creating user:', error);
             let msg = error.message;
             if (msg.includes('already registered')) msg = 'اسم المستخدم مسجل مسبقاً';
+            if (msg.includes('rate limit') || msg.includes('429')) msg = 'تجاوزت حد إرسال الإيميلات. يرجى إيقاف "Confirm Email" في إعدادات Supabase.';
             toast.error(msg || 'فشل إنشاء المستخدم');
         } finally {
             setActionLoading(false);
