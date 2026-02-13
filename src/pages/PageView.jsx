@@ -154,24 +154,24 @@ const PageView = () => {
                                             const fileType = getFileType(option.file_url);
 
                                             return (
-                                                <div className="mt-8 bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                                                <div className="mt-8 bg-white/50 backdrop-blur-sm rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                                                     {/* File Header */}
-                                                    <div className="px-5 py-4 bg-white border-b border-slate-100 flex flex-wrap items-center justify-between gap-4">
+                                                    <div className="px-5 py-4 bg-white/80 backdrop-blur border-b border-slate-100 flex flex-wrap items-center justify-between gap-4">
                                                         <div className="flex items-center gap-3">
-                                                            <div className={`p-2 rounded-lg ${fileType === 'pdf' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
+                                                            <div className={`p-2.5 rounded-xl ${fileType === 'pdf' ? 'bg-red-50 text-red-600 shadow-sm border border-red-100' : 'bg-blue-50 text-blue-600 shadow-sm border border-blue-100'}`}>
                                                                 {fileType === 'pdf' ? <FileText className="w-5 h-5" /> : <ImageIcon className="w-5 h-5" />}
                                                             </div>
-                                                            <span className="font-bold text-slate-700">
+                                                            <span className="font-bold text-slate-800 text-lg">
                                                                 {fileType === 'pdf' ? 'ملف PDF مرفق' : 'صورة مرفقة'}
                                                             </span>
                                                         </div>
 
                                                         <div className="flex gap-2">
-                                                            <a href={option.file_url} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-1.5 text-sm font-bold text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors border border-primary-100">
+                                                            <a href={option.file_url} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-xl transition-all border border-primary-100 shadow-sm">
                                                                 <ExternalLink className="w-4 h-4" />
                                                                 <span>فتح</span>
                                                             </a>
-                                                            <a href={option.file_url} download className="flex items-center gap-2 px-3 py-1.5 text-sm font-bold text-slate-600 bg-white hover:bg-slate-50 rounded-lg transition-colors border border-slate-200 hover:border-slate-300">
+                                                            <a href={option.file_url} download className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 rounded-xl transition-all border border-slate-200 shadow-sm hover:shadow">
                                                                 <Download className="w-4 h-4" />
                                                                 <span>تحميل</span>
                                                             </a>
@@ -179,42 +179,42 @@ const PageView = () => {
                                                     </div>
 
                                                     {/* File Display Area */}
-                                                    <div className="bg-slate-100/50 p-1 sm:p-4 flex justify-center min-h-[200px]">
+                                                    <div className="bg-slate-50/50 p-2 sm:p-6 flex justify-center min-h-[300px]">
                                                         {fileType === 'image' && (
                                                             <img
                                                                 src={option.file_url}
                                                                 alt={option.title}
-                                                                className="w-full h-auto rounded-xl shadow-sm border border-slate-200"
+                                                                className="w-full h-auto rounded-2xl shadow-lg border border-slate-200/60"
                                                                 loading="lazy"
                                                             />
                                                         )}
 
                                                         {fileType === 'pdf' && (
-                                                            <div className="w-full flex flex-col gap-4">
+                                                            <div className="w-full flex flex-col gap-6">
                                                                 {/* 1. Primary Method: Google Docs Viewer (Best for Mobile/Cross-Device) */}
-                                                                <div className="w-full h-[500px] sm:h-[700px] rounded-xl bg-white shadow-sm overflow-hidden relative border border-slate-200">
+                                                                <div className="w-full h-[500px] sm:h-[700px] rounded-2xl bg-white shadow-lg overflow-hidden relative border border-slate-200/60 ring-1 ring-black/5">
                                                                     <iframe
                                                                         src={`https://docs.google.com/gview?url=${encodeURIComponent(option.file_url)}&embedded=true`}
                                                                         className="w-full h-full border-0"
                                                                         title="PDF Viewer"
                                                                     ></iframe>
-                                                                    <div className="absolute top-0 right-0 p-2 pointer-events-none opacity-50">
-                                                                        <span className="text-[10px] text-slate-400">PDF Preview</span>
+                                                                    <div className="absolute top-0 right-0 p-3 pointer-events-none opacity-40 hover:opacity-100 transition-opacity">
+                                                                        <span className="bg-black/10 backdrop-blur-md text-[10px] text-slate-600 px-2 py-1 rounded-md">PDF Mode</span>
                                                                     </div>
                                                                 </div>
 
                                                                 {/* 2. Fallback / Alternative Button */}
-                                                                <div className="text-center p-4">
-                                                                    <p className="text-sm text-slate-500 mb-3">هل تواجه مشكلة في العرض؟</p>
+                                                                <div className="text-center pb-2">
                                                                     <a
                                                                         href={option.file_url}
                                                                         target="_blank"
                                                                         rel="noopener noreferrer"
-                                                                        className="inline-flex items-center gap-2 px-6 py-3 bg-slate-800 text-white rounded-xl shadow-lg hover:bg-slate-700 transition-all font-bold"
+                                                                        className="inline-flex items-center gap-2 px-8 py-3 bg-slate-900 text-white rounded-2xl shadow-xl hover:bg-slate-800 transition-all font-bold hover:scale-[1.02] active:scale-[0.98]"
                                                                     >
                                                                         <FileText className="w-5 h-5" />
-                                                                        عرض ملف PDF الأصلي
+                                                                        عرض ملف PDF بحجم كامل
                                                                     </a>
+                                                                    <p className="text-xs text-slate-400 mt-3 font-medium">اضغط هنا إذا لم يظهر الملف في الأعلى</p>
                                                                 </div>
                                                             </div>
                                                         )}
