@@ -85,7 +85,7 @@ const NotificationsPanel = () => {
             {isOpen && (
                 <>
                     <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)}></div>
-                    <div className="absolute left-0 mt-4 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 overflow-hidden transform origin-top-left transition-all">
+                    <div className="absolute right-0 mt-4 w-[calc(100vw-2rem)] sm:w-80 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 overflow-hidden transform origin-top-right transition-all">
                         <div className="p-4 border-b border-slate-50 flex justify-between items-center bg-slate-50">
                             <h3 className="font-bold text-slate-700">التنبيهات</h3>
                             <button onClick={markAllRead} className="text-xs text-primary-600 hover:text-primary-700">تحديد الكل كمقروء</button>

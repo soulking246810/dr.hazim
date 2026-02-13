@@ -79,9 +79,28 @@ export const useQuranParts = () => {
             return;
         }
 
+        // Optimistic update: immediately reflect change in UI
+        const previousParts = [...parts];
+        if (!isSelected) {
+            setParts(prev => prev.map(p =>
+                p.id === partId
+                    ? { ...p, selected_by: user.id, selected_at: new Date().toISOString(), profiles: { full_name: 'أنت' } }
+                    : p
+            ));
+        } else {
+            if (!isAdmin && currentSelectedBy !== user.id) {
+                toast.error('ليس لديك صلاحية لإلغاء هذا الجزء');
+                return;
+            }
+            setParts(prev => prev.map(p =>
+                p.id === partId
+                    ? { ...p, selected_by: null, selected_at: null, profiles: null }
+                    : p
+            ));
+        }
+
         try {
             if (!isSelected) {
-                // Select
                 const { error } = await supabase
                     .from('quran_parts')
                     .update({
@@ -94,12 +113,6 @@ export const useQuranParts = () => {
                 if (error) throw error;
                 toast.success('تم اختيار الجزء بنجاح');
             } else {
-                // Reset (Admin or own selection)
-                if (!isAdmin && currentSelectedBy !== user.id) {
-                    toast.error('ليس لديك صلاحية لإلغاء هذا الجزء');
-                    return;
-                }
-
                 const { error } = await supabase
                     .from('quran_parts')
                     .update({
@@ -111,10 +124,13 @@ export const useQuranParts = () => {
                 if (error) throw error;
                 toast.success('تم إلغاء الاختيار');
             }
+            // Refetch to get accurate server state (e.g. correct profile name)
+            fetchParts();
         } catch (error) {
             console.error('Error updating part:', error);
             toast.error('حدث خطأ، ربما تم اختيار الجزء مسبقاً');
-            fetchParts();
+            // Revert optimistic update
+            setParts(previousParts);
         }
     };
 

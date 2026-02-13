@@ -10,10 +10,6 @@ import QuranTracking from './pages/QuranTracking';
 import MainLayout from './components/layout/MainLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
-// Placeholders for now
-// const QuranTracking = () => <div className="p-6 bg-white rounded-2xl shadow-sm"><h1>متابعة الختمات (قريباً)</h1></div>;
-// const PagesLibrary = () => <div className="p-6 bg-white rounded-2xl shadow-sm"><h1>المكتبة (قريباً)</h1></div>;
-
 import { Toaster } from 'react-hot-toast';
 
 function App() {

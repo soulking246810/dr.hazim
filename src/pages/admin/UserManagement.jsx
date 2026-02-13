@@ -1,8 +1,48 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
-import { Trash2, UserPlus, Search, User, Edit2, X, Check } from 'lucide-react';
+import { Trash2, UserPlus, Search, Edit2, X, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+const Modal = ({ isOpen, onClose, title, onSubmit, children, submitLabel, actionLoading }) => {
+    if (!isOpen) return null;
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in">
+                <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <h3 className="font-bold text-xl text-slate-800">{title}</h3>
+                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors bg-slate-100 hover:bg-slate-200 p-2 rounded-full">
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+                <form onSubmit={onSubmit} className="p-6 space-y-5">
+                    {children}
+                    <div className="pt-2 flex gap-3">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="flex-1 py-3 text-slate-600 hover:bg-slate-100 rounded-xl font-bold transition-colors"
+                        >
+                            إلغاء
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={actionLoading}
+                            className="flex-1 py-3 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-700 hover:to-primary-600 text-white rounded-xl font-bold flex justify-center items-center gap-2 shadow-lg shadow-primary-500/30 transition-all disabled:opacity-70 disabled:cursor-wait"
+                        >
+                            {actionLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : (
+                                <>
+                                    <Check className="w-5 h-5" />
+                                    <span>{submitLabel}</span>
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
 
 const UserManagement = () => {
     const { user } = useAuth();
@@ -161,46 +201,6 @@ const UserManagement = () => {
         u.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const Modal = ({ isOpen, onClose, title, onSubmit, children, submitLabel }) => {
-        if (!isOpen) return null;
-        return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-                <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in">
-                    <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                        <h3 className="font-bold text-xl text-slate-800">{title}</h3>
-                        <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors bg-slate-100 hover:bg-slate-200 p-2 rounded-full">
-                            <X className="w-5 h-5" />
-                        </button>
-                    </div>
-                    <form onSubmit={onSubmit} className="p-6 space-y-5">
-                        {children}
-                        <div className="pt-2 flex gap-3">
-                            <button
-                                type="button"
-                                onClick={onClose}
-                                className="flex-1 py-3 text-slate-600 hover:bg-slate-100 rounded-xl font-bold transition-colors"
-                            >
-                                إلغاء
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={actionLoading}
-                                className="flex-1 py-3 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-700 hover:to-primary-600 text-white rounded-xl font-bold flex justify-center items-center gap-2 shadow-lg shadow-primary-500/30 transition-all"
-                            >
-                                {actionLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : (
-                                    <>
-                                        <Check className="w-5 h-5" />
-                                        <span>{submitLabel}</span>
-                                    </>
-                                )}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        );
-    };
-
     return (
         <div className="space-y-8 animate-fade-in">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -300,7 +300,7 @@ const UserManagement = () => {
             </div>
 
             {/* Create Modal */}
-            <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title="إضافة مستخدم جديد" onSubmit={handleCreateUser} submitLabel="إنشاء">
+            <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title="إضافة مستخدم جديد" onSubmit={handleCreateUser} submitLabel="إنشاء" actionLoading={actionLoading}>
                 <div>
                     <label className="block text-sm font-bold text-slate-700 mb-2">الاسم الكامل</label>
                     <input
@@ -351,7 +351,7 @@ const UserManagement = () => {
             </Modal>
 
             {/* Edit Modal */}
-            <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="تعديل بيانات المستخدم" onSubmit={handleUpdateUser} submitLabel="حفظ التغييرات">
+            <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="تعديل بيانات المستخدم" onSubmit={handleUpdateUser} submitLabel="حفظ التغييرات" actionLoading={actionLoading}>
                 <div>
                     <label className="block text-sm font-bold text-slate-700 mb-2">الاسم الكامل</label>
                     <input

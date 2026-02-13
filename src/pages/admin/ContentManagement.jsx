@@ -156,14 +156,26 @@ const ContentManagement = () => {
             const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
             const filePath = `lessons/${fileName}`;
 
+            // Try upload
             const { data, error } = await supabase.storage
                 .from('lesson-files')
                 .upload(filePath, file, {
                     cacheControl: '3600',
-                    upsert: false
+                    upsert: true
                 });
 
-            if (error) throw error;
+            if (error) {
+                console.error('Storage upload error:', error);
+                // Show the actual error message from Supabase
+                if (error.message?.includes('Bucket not found') || error.statusCode === '404') {
+                    toast.error('خطأ: الـ Bucket غير موجود. تأكد من إنشاء bucket باسم "lesson-files" في Supabase Dashboard → Storage');
+                } else if (error.message?.includes('row-level security') || error.message?.includes('policy')) {
+                    toast.error('خطأ في صلاحيات التخزين. يجب تشغيل أوامر SQL للصلاحيات.');
+                } else {
+                    toast.error(`فشل رفع الملف: ${error.message || error.error || 'خطأ غير معروف'}`);
+                }
+                return;
+            }
 
             // Get public URL
             const { data: urlData } = supabase.storage
@@ -176,7 +188,7 @@ const ContentManagement = () => {
             }
         } catch (error) {
             console.error('Upload error:', error);
-            toast.error('فشل رفع الملف. تأكد من إنشاء bucket باسم lesson-files في Supabase.');
+            toast.error(`فشل رفع الملف: ${error.message || 'خطأ غير متوقع'}`);
         } finally {
             setUploading(false);
         }

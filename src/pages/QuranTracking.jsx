@@ -5,7 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import { BookOpen, RotateCcw, Trophy } from 'lucide-react';
 
 const QuranTracking = () => {
-    const { resetAll, khatmaCount, parts } = useQuranParts();
+    const { resetAll, khatmaCount, parts, loading, togglePart } = useQuranParts();
     const { isAdmin } = useAuth();
     const [resetting, setResetting] = useState(false);
 
@@ -81,8 +81,8 @@ const QuranTracking = () => {
                 </div>
             </div>
 
-            {/* Grid */}
-            <QuranGrid />
+            {/* Grid — receives shared state from this component */}
+            <QuranGrid parts={parts} loading={loading} togglePart={togglePart} />
         </div>
     );
 };

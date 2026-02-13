@@ -1,13 +1,11 @@
 import { useState } from 'react';
-import { useQuranParts } from '../../hooks/useQuranParts';
 import { useAuth } from '../../hooks/useAuth';
 import clsx from 'clsx';
 import { CheckCircle, Lock, X } from 'lucide-react';
 
-const QuranGrid = () => {
-    const { parts, loading, togglePart } = useQuranParts();
+const QuranGrid = ({ parts, loading, togglePart }) => {
     const { user, isAdmin } = useAuth();
-    const [confirmModal, setConfirmModal] = useState(null); // { partId, partNumber, isSelected, selectedBy }
+    const [confirmModal, setConfirmModal] = useState(null);
 
     if (loading) {
         return (
@@ -22,10 +20,8 @@ const QuranGrid = () => {
         const isTaken = !!part.selected_by;
         const isTakenByMe = part.selected_by === user?.id;
 
-        // If taken by someone else and not admin, do nothing
         if (isTaken && !isTakenByMe && !isAdmin) return;
 
-        // Show confirmation modal
         setConfirmModal({
             partId: part.id,
             partNumber: part.part_number,
@@ -73,7 +69,7 @@ const QuranGrid = () => {
 
                             <span className={clsx(
                                 "text-[10px] md:text-xs font-medium z-10 text-center leading-tight",
-                                isTaken && !isTakenByMe ? "text-slate-500" : "text-slate-500"
+                                "text-slate-500"
                             )}>
                                 {!isTaken ? 'متاح' : isTakenByMe ? 'اختياري' : takenByName}
                             </span>
@@ -88,7 +84,6 @@ const QuranGrid = () => {
                                 </div>
                             )}
 
-                            {/* Admin Reset Overlay */}
                             {isTaken && isAdmin && !isTakenByMe && (
                                 <div className="absolute inset-0 bg-red-500/10 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                     <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full">إلغاء</span>
