@@ -17,6 +17,12 @@ const ContentManagement = () => {
     const [editingOption, setEditingOption] = useState(null);
     const [uploading, setUploading] = useState(false);
 
+    // Edit states for Pages and Menus
+    const [editingPageId, setEditingPageId] = useState(null);
+    const [tempPageTitle, setTempPageTitle] = useState('');
+    const [editingMenuId, setEditingMenuId] = useState(null);
+    const [tempMenuTitle, setTempMenuTitle] = useState('');
+
     useEffect(() => {
         fetchPages();
     }, []);
@@ -64,6 +70,17 @@ const ContentManagement = () => {
         }
     };
 
+    const updatePage = async (id) => {
+        if (!tempPageTitle.trim()) return;
+        const { error } = await supabase.from('pages').update({ title: tempPageTitle }).eq('id', id);
+        if (error) toast.error('فشل تحديث الصفحة');
+        else {
+            toast.success('تم تحديث اسم الصفحة');
+            setEditingPageId(null);
+            fetchPages();
+        }
+    };
+
     const deletePage = async (id) => {
         if (!confirm('هل أنت متأكد من حذف هذه الصفحة وجميع محتوياتها؟')) return;
         const { error } = await supabase.from('pages').delete().eq('id', id);
@@ -82,6 +99,17 @@ const ContentManagement = () => {
         else {
             toast.success('تم إنشاء القائمة');
             setNewMenuTitle('');
+            fetchMenus(selectedPage.id);
+        }
+    };
+
+    const updateMenu = async (id) => {
+        if (!tempMenuTitle.trim()) return;
+        const { error } = await supabase.from('menus').update({ title: tempMenuTitle }).eq('id', id);
+        if (error) toast.error('فشل تحديث القائمة');
+        else {
+            toast.success('تم تحديث اسم القائمة');
+            setEditingMenuId(null);
             fetchMenus(selectedPage.id);
         }
     };
@@ -218,10 +246,38 @@ const ContentManagement = () => {
                                 onClick={() => setSelectedPage(page)}
                                 className={`p-3 rounded-xl cursor-pointer flex justify-between items-center transition-colors group text-sm ${selectedPage?.id === page.id ? 'bg-primary-50 text-primary-700 font-medium border border-primary-200' : 'hover:bg-slate-50'}`}
                             >
-                                <span className="truncate">{page.title}</span>
-                                <button onClick={(e) => { e.stopPropagation(); deletePage(page.id); }} className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1 rounded-full transition-all shrink-0">
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
+                                {editingPageId === page.id ? (
+                                    <div className="flex items-center gap-2 w-full" onClick={e => e.stopPropagation()}>
+                                        <input
+                                            className="flex-1 min-w-0 p-1 border rounded text-xs"
+                                            value={tempPageTitle}
+                                            onChange={e => setTempPageTitle(e.target.value)}
+                                            onKeyDown={e => {
+                                                if (e.key === 'Enter') updatePage(page.id);
+                                                if (e.key === 'Escape') setEditingPageId(null);
+                                            }}
+                                            autoFocus
+                                        />
+                                        <button onClick={() => updatePage(page.id)} className="text-green-600 hover:bg-green-50 p-1 rounded-full"><Save className="w-3 h-3" /></button>
+                                        <button onClick={() => setEditingPageId(null)} className="text-red-500 hover:bg-red-50 p-1 rounded-full"><X className="w-3 h-3" /></button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <span className="truncate flex-1">{page.title}</span>
+                                        <div className="flex items-center gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button onClick={(e) => {
+                                                e.stopPropagation();
+                                                setEditingPageId(page.id);
+                                                setTempPageTitle(page.title);
+                                            }} className="text-slate-400 hover:text-primary-600 hover:bg-primary-50 p-1 rounded-full transition-all shrink-0">
+                                                <Edit className="w-4 h-4" />
+                                            </button>
+                                            <button onClick={(e) => { e.stopPropagation(); deletePage(page.id); }} className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1 rounded-full transition-all shrink-0">
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         ))}
                     </div>
@@ -256,10 +312,38 @@ const ContentManagement = () => {
                                         onClick={() => setSelectedMenu(menu)}
                                         className={`p-3 rounded-xl cursor-pointer flex justify-between items-center transition-colors group text-sm ${selectedMenu?.id === menu.id ? 'bg-primary-50 text-primary-700 font-medium border border-primary-200' : 'hover:bg-slate-50'}`}
                                     >
-                                        <span className="truncate">{menu.title}</span>
-                                        <button onClick={(e) => { e.stopPropagation(); deleteMenu(menu.id); }} className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1 rounded-full transition-all shrink-0">
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
+                                        {editingMenuId === menu.id ? (
+                                            <div className="flex items-center gap-2 w-full" onClick={e => e.stopPropagation()}>
+                                                <input
+                                                    className="flex-1 min-w-0 p-1 border rounded text-xs"
+                                                    value={tempMenuTitle}
+                                                    onChange={e => setTempMenuTitle(e.target.value)}
+                                                    onKeyDown={e => {
+                                                        if (e.key === 'Enter') updateMenu(menu.id);
+                                                        if (e.key === 'Escape') setEditingMenuId(null);
+                                                    }}
+                                                    autoFocus
+                                                />
+                                                <button onClick={() => updateMenu(menu.id)} className="text-green-600 hover:bg-green-50 p-1 rounded-full"><Save className="w-3 h-3" /></button>
+                                                <button onClick={() => setEditingMenuId(null)} className="text-red-500 hover:bg-red-50 p-1 rounded-full"><X className="w-3 h-3" /></button>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <span className="truncate flex-1">{menu.title}</span>
+                                                <div className="flex items-center gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setEditingMenuId(menu.id);
+                                                        setTempMenuTitle(menu.title);
+                                                    }} className="text-slate-400 hover:text-primary-600 hover:bg-primary-50 p-1 rounded-full transition-all shrink-0">
+                                                        <Edit className="w-4 h-4" />
+                                                    </button>
+                                                    <button onClick={(e) => { e.stopPropagation(); deleteMenu(menu.id); }} className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1 rounded-full transition-all shrink-0">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
                                 ))}
                             </div>
