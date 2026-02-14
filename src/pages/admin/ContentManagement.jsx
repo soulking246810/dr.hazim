@@ -308,8 +308,8 @@ const ContentManagement = () => {
                                                 placeholder="عنوان الدرس"
                                             />
                                             <textarea
-                                                className="w-full h-32 p-2 border rounded-lg focus:ring-2 focus:ring-primary-200 outline-none text-sm"
-                                                placeholder="محتوى الدرس (HTML مدعوم)"
+                                                className="w-full min-h-[500px] p-4 border rounded-xl focus:ring-2 focus:ring-primary-200 outline-none text-base leading-relaxed"
+                                                placeholder="محتوى الدرس (HTML مدعوم) - لا يوجد حد للنص، يمكنك كتابة نصوص طويلة جداً هنا..."
                                                 value={editingOption.content || ''}
                                                 onChange={e => setEditingOption({ ...editingOption, content: e.target.value })}
                                             />
