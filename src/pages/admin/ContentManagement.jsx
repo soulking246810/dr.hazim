@@ -219,7 +219,7 @@ const ContentManagement = () => {
                                 className={`p-3 rounded-xl cursor-pointer flex justify-between items-center transition-colors group text-sm ${selectedPage?.id === page.id ? 'bg-primary-50 text-primary-700 font-medium border border-primary-200' : 'hover:bg-slate-50'}`}
                             >
                                 <span className="truncate">{page.title}</span>
-                                <button onClick={(e) => { e.stopPropagation(); deletePage(page.id); }} className="text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                                <button onClick={(e) => { e.stopPropagation(); deletePage(page.id); }} className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1 rounded-full transition-all shrink-0">
                                     <Trash2 className="w-4 h-4" />
                                 </button>
                             </div>
@@ -257,7 +257,7 @@ const ContentManagement = () => {
                                         className={`p-3 rounded-xl cursor-pointer flex justify-between items-center transition-colors group text-sm ${selectedMenu?.id === menu.id ? 'bg-primary-50 text-primary-700 font-medium border border-primary-200' : 'hover:bg-slate-50'}`}
                                     >
                                         <span className="truncate">{menu.title}</span>
-                                        <button onClick={(e) => { e.stopPropagation(); deleteMenu(menu.id); }} className="text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                                        <button onClick={(e) => { e.stopPropagation(); deleteMenu(menu.id); }} className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1 rounded-full transition-all shrink-0">
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
