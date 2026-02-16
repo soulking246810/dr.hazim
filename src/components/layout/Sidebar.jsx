@@ -7,8 +7,8 @@ const Sidebar = ({ onNavigate }) => {
     const { isAdmin, logout } = useAuth();
 
     const navItems = [
-        { to: '/dashboard', label: 'لوحة التحكم', icon: LayoutDashboard },
-        { to: '/quran-tracking', label: 'متابعة الختمات', icon: BookOpen },
+        { to: '/dashboard', label: 'الصفحة الرئيسية', icon: LayoutDashboard },
+        { to: '/quran-tracking', label: 'الختمات القرآنية الجماعية', icon: BookOpen },
         { to: '/pages/library', label: 'المكتبة', icon: List },
     ];
 
