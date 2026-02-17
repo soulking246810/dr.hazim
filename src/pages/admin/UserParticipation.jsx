@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../../lib/supabase';
 import { Users, Smartphone, Clock, Award, Calendar, ChevronDown, ChevronUp, History } from 'lucide-react';
 import clsx from 'clsx';
 import { format } from 'date-fns';

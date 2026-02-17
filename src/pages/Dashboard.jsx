@@ -88,6 +88,11 @@ const Dashboard = () => {
     };
 
     const fetchNotificationStats = async () => {
+        if (!user) {
+            setStats(prev => ({ ...prev, unreadNotifications: 0 }));
+            return;
+        }
+
         const { count } = await supabase
             .from('notifications')
             .select('*', { count: 'exact', head: true })
