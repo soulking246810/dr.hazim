@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import clsx from 'clsx';
-import { CheckCircle, Lock, X } from 'lucide-react';
+import { CheckCircle, Lock } from 'lucide-react';
 
 const QuranGrid = ({ parts, loading, togglePart }) => {
     const { user, isAdmin } = useAuth();
     const [confirmModal, setConfirmModal] = useState(null);
+    const [guestName, setGuestName] = useState('');
+
+    // Device ID check (read from localStorage just for UI state matching)
+    const deviceId = localStorage.getItem('quran_app_device_id');
 
     if (loading) {
         return (
@@ -17,8 +21,11 @@ const QuranGrid = ({ parts, loading, togglePart }) => {
     }
 
     const handlePartClick = (part) => {
-        const isTaken = !!part.selected_by;
-        const isTakenByMe = part.selected_by === user?.id;
+        const isTaken = !!(part.selected_by || part.guest_name);
+
+        let isTakenByMe = false;
+        if (user && part.selected_by === user.id) isTakenByMe = true;
+        if (!user && part.device_id === deviceId) isTakenByMe = true;
 
         if (isTaken && !isTakenByMe && !isAdmin) return;
 
@@ -27,14 +34,29 @@ const QuranGrid = ({ parts, loading, togglePart }) => {
             partNumber: part.part_number,
             isSelected: isTaken,
             selectedBy: part.selected_by,
-            takenByName: part.profiles?.full_name || 'مستخدم',
+            guestName: part.guest_name,
+            deviceId: part.device_id,
+            takenByName: part.profiles?.full_name || part.guest_name || 'مستخدم',
             isTakenByMe
         });
+        setGuestName(''); // Reset input
     };
 
     const handleConfirm = async () => {
         if (!confirmModal) return;
-        await togglePart(confirmModal.partId, confirmModal.isSelected, confirmModal.selectedBy);
+
+        if (!confirmModal.isSelected && !user && !guestName.trim()) {
+            return; // Prevent empty name for guests
+        }
+
+        await togglePart(
+            confirmModal.partId,
+            confirmModal.isSelected,
+            confirmModal.selectedBy,
+            confirmModal.guestName,
+            confirmModal.deviceId,
+            guestName // Pass new guest name
+        );
         setConfirmModal(null);
     };
 
@@ -42,9 +64,13 @@ const QuranGrid = ({ parts, loading, togglePart }) => {
         <>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 md:gap-4">
                 {parts.map((part) => {
-                    const isTaken = !!part.selected_by;
-                    const isTakenByMe = part.selected_by === user?.id;
-                    const takenByName = part.profiles?.full_name || 'مستخدم';
+                    const isTaken = !!(part.selected_by || part.guest_name);
+
+                    let isTakenByMe = false;
+                    if (user && part.selected_by === user.id) isTakenByMe = true;
+                    if (!user && part.device_id === deviceId) isTakenByMe = true;
+
+                    const takenByName = part.profiles?.full_name || part.guest_name || 'مستخدم';
 
                     return (
                         <button
@@ -68,10 +94,10 @@ const QuranGrid = ({ parts, loading, togglePart }) => {
                             </span>
 
                             <span className={clsx(
-                                "text-[10px] md:text-xs font-medium z-10 text-center leading-tight",
+                                "text-[10px] md:text-xs font-medium z-10 text-center leading-tight truncate w-full px-1",
                                 "text-slate-500"
                             )}>
-                                {!isTaken ? 'متاح' : isTakenByMe ? 'اختياري' : takenByName}
+                                {!isTaken ? 'متاح' : isTakenByMe ? (user ? 'أنت' : takenByName) : takenByName}
                             </span>
 
                             {isTaken && (
@@ -112,11 +138,27 @@ const QuranGrid = ({ parts, loading, togglePart }) => {
                                     : 'تأكيد الاختيار'}
                             </h3>
 
-                            <p className="text-slate-500 text-sm leading-relaxed">
+                            <p className="text-slate-500 text-sm leading-relaxed mb-4">
                                 {confirmModal.isSelected
                                     ? `هل أنت متأكد من إلغاء اختيار الجزء ${confirmModal.partNumber}؟`
-                                    : `هل أنت متأكد من اختيار الجزء ${confirmModal.partNumber}؟ سيظهر اسمك تحت هذا الجزء للجميع.`}
+                                    : `هل أنت متأكد من اختيار الجزء ${confirmModal.partNumber}؟`}
                             </p>
+
+                            {/* Guest Name Input */}
+                            {!user && !confirmModal.isSelected && (
+                                <div className="mb-4">
+                                    <label className="block text-sm font-bold text-slate-700 mb-1">الاسم الكريم</label>
+                                    <input
+                                        type="text"
+                                        value={guestName}
+                                        onChange={(e) => setGuestName(e.target.value)}
+                                        placeholder="اكتب اسمك هنا..."
+                                        className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition-all text-center"
+                                        autoFocus
+                                    />
+                                    <p className="text-xs text-slate-500 mt-2">سيتم تسجيل هذا الجزء باسمك.</p>
+                                </div>
+                            )}
                         </div>
 
                         <div className="p-4 border-t border-slate-100 flex gap-3">
@@ -128,14 +170,15 @@ const QuranGrid = ({ parts, loading, togglePart }) => {
                             </button>
                             <button
                                 onClick={handleConfirm}
+                                disabled={!user && !confirmModal.isSelected && !guestName.trim()}
                                 className={clsx(
-                                    "flex-1 py-3 text-white rounded-xl font-bold transition-all shadow-lg",
+                                    "flex-1 py-3 text-white rounded-xl font-bold transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed",
                                     confirmModal.isSelected
                                         ? "bg-red-500 hover:bg-red-600 shadow-red-500/30"
                                         : "bg-primary-600 hover:bg-primary-700 shadow-primary-500/30"
                                 )}
                             >
-                                {confirmModal.isSelected ? 'نعم، إلغاء' : 'نعم، اختيار'}
+                                {confirmModal.isSelected ? 'نعم، إلغاء' : 'تأكيد وحفظ'}
                             </button>
                         </div>
                     </div>

@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import ContentManagement from './pages/admin/ContentManagement';
 import UserManagement from './pages/admin/UserManagement';
+import UserParticipation from './pages/admin/UserParticipation';
 import PagesLibrary from './pages/PagesLibrary';
 import PageView from './pages/PageView';
 import QuranTracking from './pages/QuranTracking';
@@ -19,13 +20,15 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
 
-        <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+        {/* Public Routes with Layout */}
+        <Route element={<MainLayout />}>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/quran-tracking" element={<QuranTracking />} />
           <Route path="/pages/library" element={<PagesLibrary />} />
           <Route path="/pages/:id" element={<PageView />} />
 
+          {/* Admin Routes */}
           <Route path="/admin" element={
             <ProtectedRoute requireAdmin>
               <AdminDashboard />
@@ -39,6 +42,11 @@ function App() {
           <Route path="/admin/content" element={
             <ProtectedRoute requireAdmin>
               <ContentManagement />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/participation" element={
+            <ProtectedRoute requireAdmin>
+              <UserParticipation />
             </ProtectedRoute>
           } />
         </Route>

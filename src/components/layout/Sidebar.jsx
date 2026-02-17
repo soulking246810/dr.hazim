@@ -4,7 +4,7 @@ import { BookOpen, LayoutDashboard, LogOut, Users, List, ShieldCheck } from 'luc
 import clsx from 'clsx';
 
 const Sidebar = ({ onNavigate }) => {
-    const { isAdmin, logout } = useAuth();
+    const { user, isAdmin, logout } = useAuth();
 
     const navItems = [
         { to: '/dashboard', label: 'الصفحة الرئيسية', icon: LayoutDashboard },
@@ -15,6 +15,7 @@ const Sidebar = ({ onNavigate }) => {
     const adminItems = [
         { to: '/admin', label: 'لوحة الإدارة', icon: ShieldCheck },
         { to: '/admin/users', label: 'إدارة المستخدمين', icon: Users },
+        { to: '/admin/participation', label: 'سجل المشاركين', icon: BookOpen },
     ];
 
     return (
@@ -95,17 +96,29 @@ const Sidebar = ({ onNavigate }) => {
                 )}
             </nav>
 
-            {/* Logout Button */}
+            {/* Footer Actions */}
             <div className="p-6 border-t border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                <button
-                    onClick={logout}
-                    className="flex items-center gap-3 w-full px-4 py-3.5 text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-2xl transition-colors whitespace-nowrap font-medium group"
-                >
-                    <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
-                        <LogOut className="w-4 h-4 shrink-0" />
-                    </div>
-                    <span>تسجيل الخروج</span>
-                </button>
+                {user ? (
+                    <button
+                        onClick={logout}
+                        className="flex items-center gap-3 w-full px-4 py-3.5 text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-2xl transition-colors whitespace-nowrap font-medium group"
+                    >
+                        <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
+                            <LogOut className="w-4 h-4 shrink-0" />
+                        </div>
+                        <span>تسجيل الخروج</span>
+                    </button>
+                ) : (
+                    <NavLink
+                        to="/login"
+                        className="flex items-center gap-3 w-full px-4 py-3.5 text-slate-400 hover:bg-slate-800/50 hover:text-white rounded-2xl transition-colors whitespace-nowrap font-medium group"
+                    >
+                        <div className="w-8 h-8 rounded-full bg-slate-800/50 flex items-center justify-center group-hover:bg-slate-700 transition-colors">
+                            <ShieldCheck className="w-4 h-4 shrink-0" />
+                        </div>
+                        <span>دخول المشرفين</span>
+                    </NavLink>
+                )}
             </div>
         </aside>
     );

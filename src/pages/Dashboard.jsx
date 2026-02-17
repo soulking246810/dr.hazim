@@ -14,8 +14,6 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!user) return;
-
         // Initial fetch
         fetchStats();
 
@@ -29,8 +27,8 @@ const Dashboard = () => {
 
         const notifSubscription = supabase
             .channel('public:notifications')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, () => {
-                fetchNotificationStats();
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: user ? `user_id=eq.${user.id}` : undefined }, () => {
+                if (user) fetchNotificationStats();
             })
             .subscribe();
 
@@ -59,10 +57,24 @@ const Dashboard = () => {
     };
 
     const fetchQuranStats = async () => {
-        const { count } = await supabase
-            .from('quran_parts')
-            .select('*', { count: 'exact', head: true })
-            .eq('selected_by', user.id);
+        let count = 0;
+
+        if (user) {
+            const { count: c } = await supabase
+                .from('quran_parts')
+                .select('*', { count: 'exact', head: true })
+                .eq('selected_by', user.id);
+            count = c;
+        } else {
+            const deviceId = localStorage.getItem('quran_app_device_id');
+            if (deviceId) {
+                const { count: c } = await supabase
+                    .from('quran_parts')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('device_id', deviceId);
+                count = c;
+            }
+        }
 
         setStats(prev => ({ ...prev, quranParts: count || 0 }));
     };
