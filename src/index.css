@@ -130,3 +130,15 @@
   color: #0f172a;
   font-weight: 700;
 }
+
+/* Custom Fonts */
+@font-face {
+  font-family: 'Sakkal Majalla';
+  src: url('./assets/majalla.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.font-sakkal {
+  font-family: 'Sakkal Majalla', 'Amiri', 'Arial', sans-serif;
+}

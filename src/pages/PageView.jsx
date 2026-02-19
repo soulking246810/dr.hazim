@@ -10,6 +10,12 @@ const PageView = () => {
     const [options, setOptions] = useState({});
     const [loading, setLoading] = useState(true);
 
+    const [fontSize, setFontSize] = useState(2); // Default to middle
+
+    // Scoped Font Sizes
+    const menuSizes = ['text-xl', 'text-2xl', 'text-3xl', 'text-4xl', 'text-5xl'];
+    const contentSizes = ['prose-xl', 'prose-2xl', 'text-2xl leading-relaxed', 'text-3xl leading-relaxed', 'text-4xl leading-relaxed'];
+
     // Accordion State: Track which lesson ID is currently expanded
     const [expandedLessonId, setExpandedLessonId] = useState(null);
 
@@ -60,14 +66,14 @@ const PageView = () => {
         </div>
     );
 
-    if (!page) return <div className="text-center p-12 text-slate-500 font-bold text-lg">الصفحة غير موجودة</div>;
+    if (!page) return <div className="text-center p-12 text-slate-500 font-bold text-2xl font-sakkal">الصفحة غير موجودة</div>;
 
     return (
-        <div className="max-w-4xl mx-auto pb-20 animate-fade-in relative z-0">
+        <div className="max-w-4xl mx-auto pb-20 animate-fade-in relative z-0 font-sakkal">
             {/* Header */}
-            <div className="mb-8">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 leading-tight">{page.title}</h1>
-                <div className="h-1.5 w-24 bg-gradient-to-r from-primary-500 to-primary-300 rounded-full"></div>
+            <div className="mb-10 text-center sm:text-right">
+                <h1 className="text-4xl sm:text-6xl font-extrabold text-slate-900 mb-4 leading-tight">{page.title}</h1>
+                <div className="h-2 w-32 bg-gradient-to-r from-primary-500 to-primary-300 rounded-full inline-block sm:block"></div>
             </div>
 
             {/* Menus & Content */}
@@ -76,14 +82,14 @@ const PageView = () => {
                     <div key={menu.id}>
                         {/* Section Header */}
                         <div className="flex items-center gap-3 mb-6">
-                            <span className="w-1.5 h-6 rounded-full bg-primary-500"></span>
-                            <h2 className="text-2xl font-bold text-slate-800">{menu.title}</h2>
+                            <span className="w-2 h-8 rounded-full bg-primary-500"></span>
+                            <h2 className={`font-bold text-slate-800 transition-all ${menuSizes[fontSize]}`}>{menu.title}</h2>
                         </div>
 
                         {/* Lessons List (Accordion) */}
                         <div className="space-y-4">
                             {options[menu.id]?.length === 0 && (
-                                <p className="text-slate-400 font-medium py-4 text-sm bg-slate-50 rounded-xl px-4 border border-slate-100 border-dashed">
+                                <p className="text-slate-400 font-medium py-6 text-xl bg-slate-50 rounded-xl px-4 border border-slate-100 border-dashed">
                                     لا يوجد دروس في هذا القسم حالياً
                                 </p>
                             )}
@@ -95,11 +101,31 @@ const PageView = () => {
                                     index={index}
                                     isOpen={expandedLessonId === lesson.id}
                                     onToggle={() => handleLessonToggle(lesson.id)}
+                                    fontSizeClass={contentSizes[fontSize]}
                                 />
                             ))}
                         </div>
                     </div>
                 ))}
+            </div>
+
+            {/* Font Control */}
+            <div className="fixed bottom-6 left-6 z-50 flex items-center gap-3 bg-white/95 p-3 rounded-full shadow-2xl border border-slate-200 backdrop-blur-md">
+                <button
+                    onClick={() => setFontSize(prev => Math.min(prev + 1, 4))}
+                    className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-700 font-bold text-lg border border-slate-100 shadow-sm"
+                    aria-label="تكبير الخط"
+                >
+                    A+
+                </button>
+                <div className="w-px h-6 bg-slate-300"></div>
+                <button
+                    onClick={() => setFontSize(prev => Math.max(prev - 1, 0))}
+                    className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-700 font-bold text-base border border-slate-100 shadow-sm"
+                    aria-label="تصغير الخط"
+                >
+                    A-
+                </button>
             </div>
         </div>
     );

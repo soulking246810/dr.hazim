@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, PlayCircle } from 'lucide-react';
 import FileViewer from './FileViewer';
 
-const LessonAccordion = ({ lesson, isOpen, onToggle, index }) => {
+const LessonAccordion = ({ lesson, isOpen, onToggle, index, fontSizeClass = 'prose-lg' }) => {
 
     return (
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden mb-4 transition-shadow hover:shadow-md">
@@ -40,11 +40,11 @@ const LessonAccordion = ({ lesson, isOpen, onToggle, index }) => {
                             {/* Text Content */}
                             {lesson.content && (
                                 <div
-                                    className="prose prose-lg prose-slate max-w-none 
+                                    className={`prose ${fontSizeClass} prose-slate max-w-none 
                                     prose-p:text-slate-700 prose-p:leading-8 
                                     prose-headings:text-slate-900 prose-headings:font-bold
                                     prose-li:text-slate-700 prose-strong:text-slate-900
-                                    mb-6"
+                                    mb-6 font-sakkal`}
                                     dangerouslySetInnerHTML={{ __html: lesson.content }}
                                 />
                             )}

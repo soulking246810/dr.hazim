@@ -130,9 +130,9 @@ const Dashboard = () => {
                 </div>
 
                 <div className="relative z-10">
-                    <h2 className="text-2xl sm:text-3xl font-bold mb-2">مرحباً بك، {profile?.full_name} 👋</h2>
+                    <h2 className="text-2xl sm:text-3xl font-bold mb-2">قافلة المتعهد الحاج د. حازم محمد خضير الطائي</h2>
                     <p className="text-primary-100 text-base sm:text-lg max-w-xl leading-relaxed opacity-90">
-                        تابع تعلمك ومتابعتك في تعليمات الحج. كل خطوة تقربك نحو الإتقان.
+                        "الحج لقاء الله" خدمة الحاج شرف لنا وسبب توفيقنا ووسيلة قربنا لله عز وجل
                     </p>
                     <div className="mt-5 sm:mt-6 flex flex-wrap gap-3">
                         <Link to="/quran-tracking" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white px-4 sm:px-5 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2 text-sm border border-white/10">
