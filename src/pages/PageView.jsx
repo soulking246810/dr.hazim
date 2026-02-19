@@ -69,7 +69,7 @@ const PageView = () => {
     if (!page) return <div className="text-center p-12 text-slate-500 font-bold text-2xl font-sakkal">الصفحة غير موجودة</div>;
 
     return (
-        <div className="max-w-4xl mx-auto pb-20 animate-fade-in relative z-0 font-sakkal">
+        <div className="max-w-4xl mx-auto pb-32 animate-fade-in relative z-0 font-sakkal">
             {/* Header */}
             <div className="mb-10 text-center sm:text-right">
                 <h1 className="text-4xl sm:text-6xl font-extrabold text-slate-900 mb-4 leading-tight">{page.title}</h1>
@@ -110,18 +110,18 @@ const PageView = () => {
             </div>
 
             {/* Font Control */}
-            <div className="fixed bottom-6 left-6 z-50 flex items-center gap-3 bg-white/95 p-3 rounded-full shadow-2xl border border-slate-200 backdrop-blur-md">
+            <div className="fixed bottom-3 left-3 z-50 flex items-center gap-1.5 bg-white/95 p-1.5 rounded-full shadow-2xl border border-slate-200 backdrop-blur-md transition-all hover:scale-105">
                 <button
                     onClick={() => setFontSize(prev => Math.min(prev + 1, 4))}
-                    className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-700 font-bold text-lg border border-slate-100 shadow-sm"
+                    className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-700 font-bold text-sm border border-slate-100 shadow-sm transition-colors"
                     aria-label="تكبير الخط"
                 >
                     A+
                 </button>
-                <div className="w-px h-6 bg-slate-300"></div>
+                <div className="w-px h-4 bg-slate-300"></div>
                 <button
                     onClick={() => setFontSize(prev => Math.max(prev - 1, 0))}
-                    className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-700 font-bold text-base border border-slate-100 shadow-sm"
+                    className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-100 shadow-sm transition-colors"
                     aria-label="تصغير الخط"
                 >
                     A-
