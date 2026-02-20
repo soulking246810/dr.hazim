@@ -10,41 +10,66 @@ import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
 
 /* ------------------------------------------------------------------ */
-/*  Single PDF page rendered to a <canvas>                            */
+/*  Single PDF page rendered as a high-res IMAGE                      */
+/*  Renders at 2× resolution for crisp Arabic text, then converts     */
+/*  to a PNG image — guarantees ALL content looks perfect.             */
 /* ------------------------------------------------------------------ */
+const RENDER_SCALE_MULTIPLIER = 2; // 2× for Retina-quality output
+
 const PdfPage = ({ page, scale }) => {
-    const canvasRef = useRef(null);
+    const [imgSrc, setImgSrc] = useState(null);
     const renderTaskRef = useRef(null);
 
     useEffect(() => {
-        if (!page || !canvasRef.current) return;
+        if (!page) return;
+        let cancelled = false;
 
-        const canvas = canvasRef.current;
-        const context = canvas.getContext('2d');
-
-        // Cancel any ongoing render
+        // Cancel previous render
         if (renderTaskRef.current) {
             renderTaskRef.current.cancel();
             renderTaskRef.current = null;
         }
 
-        const viewport = page.getViewport({ scale });
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
+        const renderToImage = async () => {
+            try {
+                // Render at 2× the display scale for crisp text
+                const hiResScale = scale * RENDER_SCALE_MULTIPLIER;
+                const viewport = page.getViewport({ scale: hiResScale });
 
-        const renderTask = page.render({
-            canvasContext: context,
-            viewport: viewport,
-        });
-        renderTaskRef.current = renderTask;
+                // Create an offscreen canvas
+                const offscreen = document.createElement('canvas');
+                offscreen.width = viewport.width;
+                offscreen.height = viewport.height;
+                const ctx = offscreen.getContext('2d');
 
-        renderTask.promise.catch((err) => {
-            if (err?.name !== 'RenderingCancelled') {
-                console.warn('Page render issue:', err);
+                const renderTask = page.render({
+                    canvasContext: ctx,
+                    viewport: viewport,
+                });
+                renderTaskRef.current = renderTask;
+
+                await renderTask.promise;
+
+                if (!cancelled) {
+                    // Convert to image data URL (PNG)
+                    const dataUrl = offscreen.toDataURL('image/png');
+                    setImgSrc(dataUrl);
+                }
+
+                // Clean up offscreen canvas
+                offscreen.width = 0;
+                offscreen.height = 0;
+            } catch (err) {
+                if (err?.name !== 'RenderingCancelled' && !cancelled) {
+                    console.warn('Page render issue:', err);
+                }
             }
-        });
+        };
+
+        renderToImage();
 
         return () => {
+            cancelled = true;
             if (renderTaskRef.current) {
                 renderTaskRef.current.cancel();
                 renderTaskRef.current = null;
@@ -52,9 +77,20 @@ const PdfPage = ({ page, scale }) => {
         };
     }, [page, scale]);
 
+    if (!imgSrc) {
+        // Placeholder while rendering
+        return (
+            <div className="w-full flex items-center justify-center bg-white rounded-lg shadow-lg"
+                style={{ aspectRatio: '210 / 297', maxWidth: '100%' }}>
+                <div className="w-6 h-6 border-3 border-slate-200 border-t-blue-500 rounded-full animate-spin" />
+            </div>
+        );
+    }
+
     return (
-        <canvas
-            ref={canvasRef}
+        <img
+            src={imgSrc}
+            alt={`PDF page`}
             className="shadow-lg rounded-lg bg-white"
             style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
         />
@@ -111,6 +147,7 @@ const FileViewer = ({ fileUrl }) => {
                     url: fileUrl,
                     cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',
                     cMapPacked: true,
+                    standardFontDataUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/',
                 }).promise;
 
                 if (cancelled) return;

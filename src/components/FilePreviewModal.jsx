@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { X, Download, ExternalLink } from 'lucide-react';
+import FileViewer from './LessonViewer/FileViewer';
 
 const FilePreviewModal = ({ isOpen, onClose, fileUrl, fileType, title }) => {
     // Close on ESC key
@@ -72,45 +73,8 @@ const FilePreviewModal = ({ isOpen, onClose, fileUrl, fileType, title }) => {
                     )}
 
                     {fileType === 'pdf' && (
-                        <div className="w-full h-full flex flex-col">
-                            {/* PDF embed for desktop */}
-                            <object
-                                data={fileUrl}
-                                type="application/pdf"
-                                className="w-full flex-1 hidden sm:block"
-                                style={{ minHeight: '70vh' }}
-                            >
-                                <div className="flex flex-col items-center justify-center py-16 gap-4">
-                                    <p className="text-slate-500">لا يمكن عرض الملف مباشرة</p>
-                                    <a
-                                        href={fileUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="bg-primary-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-primary-700 transition-colors"
-                                    >
-                                        فتح ملف PDF
-                                    </a>
-                                </div>
-                            </object>
-                            {/* Mobile fallback — PDF can't embed well on mobile */}
-                            <div className="flex sm:hidden flex-col items-center justify-center py-16 gap-4 px-4">
-                                <div className="w-20 h-20 bg-red-50 rounded-2xl flex items-center justify-center mb-4">
-                                    <svg className="w-10 h-10 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                                        <polyline points="14 2 14 8 20 8" />
-                                    </svg>
-                                </div>
-                                <p className="text-slate-600 font-bold text-lg">ملف PDF</p>
-                                <p className="text-slate-400 text-sm text-center">اضغط الزر أدناه لفتح الملف</p>
-                                <a
-                                    href={fileUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="bg-primary-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/30"
-                                >
-                                    فتح ملف PDF
-                                </a>
-                            </div>
+                        <div className="w-full h-full flex-1 overflow-hidden bg-slate-100">
+                            <FileViewer fileUrl={fileUrl} />
                         </div>
                     )}
                 </div>
