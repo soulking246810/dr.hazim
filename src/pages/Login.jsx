@@ -52,8 +52,8 @@ const Login = () => {
                     <div className="w-16 h-16 bg-white/20 rounded-2xl mx-auto flex items-center justify-center backdrop-blur-sm mb-4">
                         <span className="text-2xl font-bold">حج</span>
                     </div>
-                    <h2 className="text-2xl font-bold mb-2">تعليمات الحج</h2>
-                    <p className="text-primary-100 text-sm">أهلاً بك في منصة التعلم والمتابعة</p>
+                    <h2 className="text-2xl font-bold mb-2">الحج المقبول</h2>
+                    <p className="text-primary-100 text-sm">تسكين للقلوب وتقوية للدين</p>
                 </div>
 
                 <div className="p-8">

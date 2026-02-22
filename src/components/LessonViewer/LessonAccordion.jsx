@@ -2,6 +2,47 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, PlayCircle } from 'lucide-react';
 import FileViewer from './FileViewer';
 
+/**
+ * Convert any YouTube URL to an embeddable URL.
+ * Supports: watch?v=, youtu.be/, /embed/, /shorts/, /live/
+ */
+const getYouTubeEmbedUrl = (url) => {
+    if (!url) return null;
+    let videoId = null;
+
+    try {
+        const urlObj = new URL(url);
+
+        if (urlObj.hostname.includes('youtu.be')) {
+            // https://youtu.be/VIDEO_ID
+            videoId = urlObj.pathname.slice(1).split('/')[0];
+        } else if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtube-nocookie.com')) {
+            if (urlObj.pathname.startsWith('/embed/')) {
+                // Already an embed URL
+                videoId = urlObj.pathname.split('/embed/')[1]?.split('/')[0];
+            } else if (urlObj.pathname.startsWith('/shorts/')) {
+                videoId = urlObj.pathname.split('/shorts/')[1]?.split('/')[0];
+            } else if (urlObj.pathname.startsWith('/live/')) {
+                videoId = urlObj.pathname.split('/live/')[1]?.split('/')[0];
+            } else if (urlObj.searchParams.get('v')) {
+                // https://www.youtube.com/watch?v=VIDEO_ID
+                videoId = urlObj.searchParams.get('v');
+            }
+        }
+    } catch {
+        // Fallback regex for malformed URLs
+        const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+        if (match) videoId = match[1];
+    }
+
+    if (videoId) {
+        // Strip any extra characters
+        videoId = videoId.split('?')[0].split('&')[0].split('#')[0];
+        return `https://www.youtube.com/embed/${videoId}`;
+    }
+    return null;
+};
+
 const LessonAccordion = ({ lesson, isOpen, onToggle, index, fontSizeClass = 'prose-lg' }) => {
 
     return (
@@ -50,26 +91,29 @@ const LessonAccordion = ({ lesson, isOpen, onToggle, index, fontSizeClass = 'pro
                             )}
 
                             {/* Video Embed */}
-                            {lesson.video_url && (
-                                <div className="mb-8 rounded-xl overflow-hidden shadow-lg border border-slate-200 bg-slate-900 aspect-video relative group max-w-3xl mx-auto">
-                                    {lesson.video_url.includes('youtube.com') || lesson.video_url.includes('youtu.be') ? (
-                                        <iframe
-                                            className="w-full h-full"
-                                            src={lesson.video_url.replace('watch?v=', 'embed/').split('&')[0]}
-                                            title={lesson.title}
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                            allowFullScreen
-                                        ></iframe>
-                                    ) : (
-                                        <div className="flex flex-col items-center justify-center h-full text-slate-400 gap-4">
-                                            <PlayCircle className="w-16 h-16 text-white opacity-80 group-hover:opacity-100 transition-opacity" />
-                                            <a href={lesson.video_url} target="_blank" rel="noopener noreferrer" className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors font-bold backdrop-blur-sm">
-                                                فتح الفيديو في نافذة جديدة
-                                            </a>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
+                            {lesson.video_url && (() => {
+                                const embedUrl = getYouTubeEmbedUrl(lesson.video_url);
+                                return (
+                                    <div className="mb-8 rounded-xl overflow-hidden shadow-lg border border-slate-200 bg-slate-900 aspect-video relative group max-w-3xl mx-auto">
+                                        {embedUrl ? (
+                                            <iframe
+                                                className="w-full h-full"
+                                                src={embedUrl}
+                                                title={lesson.title}
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                            ></iframe>
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center h-full text-slate-400 gap-4">
+                                                <PlayCircle className="w-16 h-16 text-white opacity-80 group-hover:opacity-100 transition-opacity" />
+                                                <a href={lesson.video_url} target="_blank" rel="noopener noreferrer" className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors font-bold backdrop-blur-sm">
+                                                    فتح الفيديو في نافذة جديدة
+                                                </a>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })()}
 
                             {/* File Viewer (PDF / Image) */}
                             {lesson.file_url && (

@@ -29,8 +29,8 @@ const Sidebar = ({ onNavigate }) => {
                     </div>
                 </div>
                 <div>
-                    <h1 className="text-lg font-bold text-white tracking-wide">تعليمات الحج</h1>
-                    <p className="text-xs text-slate-400 font-medium">للتعلم والمتابعة</p>
+                    <h1 className="text-lg font-bold text-white tracking-wide">الحج المقبول</h1>
+                    <p className="text-xs text-slate-400 font-medium">تسكين للقلوب وتقوية للدين</p>
                 </div>
             </div>
 
