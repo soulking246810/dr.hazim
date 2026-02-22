@@ -4,20 +4,35 @@ import FileViewer from './FileViewer';
 
 /**
  * Convert any YouTube URL to an embeddable URL.
- * Supports: watch?v=, youtu.be/, /embed/, /shorts/, /live/
+ * Supports: watch?v=, youtu.be/, /embed/, /shorts/, /live/, /playlist?list=
  */
 const getYouTubeEmbedUrl = (url) => {
     if (!url) return null;
     let videoId = null;
+    let listId = null;
 
     try {
         const urlObj = new URL(url);
+        const isYouTube = urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtube-nocookie.com');
+
+        // Always grab the list param if present
+        if (isYouTube) {
+            listId = urlObj.searchParams.get('list');
+        }
 
         if (urlObj.hostname.includes('youtu.be')) {
             // https://youtu.be/VIDEO_ID
             videoId = urlObj.pathname.slice(1).split('/')[0];
-        } else if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtube-nocookie.com')) {
-            if (urlObj.pathname.startsWith('/embed/')) {
+            // youtu.be links can also carry ?list=
+            listId = urlObj.searchParams.get('list') || listId;
+        } else if (isYouTube) {
+            if (urlObj.pathname === '/playlist') {
+                // Pure playlist URL: youtube.com/playlist?list=PLAYLIST_ID
+                // No individual video — embed the whole playlist
+                if (listId) {
+                    return `https://www.youtube.com/embed/videoseries?list=${listId}`;
+                }
+            } else if (urlObj.pathname.startsWith('/embed/')) {
                 // Already an embed URL
                 videoId = urlObj.pathname.split('/embed/')[1]?.split('/')[0];
             } else if (urlObj.pathname.startsWith('/shorts/')) {
@@ -25,7 +40,7 @@ const getYouTubeEmbedUrl = (url) => {
             } else if (urlObj.pathname.startsWith('/live/')) {
                 videoId = urlObj.pathname.split('/live/')[1]?.split('/')[0];
             } else if (urlObj.searchParams.get('v')) {
-                // https://www.youtube.com/watch?v=VIDEO_ID
+                // https://www.youtube.com/watch?v=VIDEO_ID  (may also have &list=)
                 videoId = urlObj.searchParams.get('v');
             }
         }
@@ -33,11 +48,17 @@ const getYouTubeEmbedUrl = (url) => {
         // Fallback regex for malformed URLs
         const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
         if (match) videoId = match[1];
+        // Try to grab list param from raw string
+        const listMatch = url.match(/[?&]list=([a-zA-Z0-9_-]+)/);
+        if (listMatch) listId = listMatch[1];
     }
 
     if (videoId) {
-        // Strip any extra characters
         videoId = videoId.split('?')[0].split('&')[0].split('#')[0];
+        // If there's a playlist, include it so the user can navigate all videos
+        if (listId) {
+            return `https://www.youtube.com/embed/${videoId}?list=${listId}`;
+        }
         return `https://www.youtube.com/embed/${videoId}`;
     }
     return null;
